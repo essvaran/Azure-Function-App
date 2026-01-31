@@ -1,4 +1,5 @@
 using Azure.Data.Tables;
+using Azure.Storage.Queues;
 using FunctionApp.Repositories;
 using FunctionApp.Services;
 using Microsoft.Azure.Functions.Worker;
@@ -23,6 +24,15 @@ namespace FunctionApp
                     {
                         var connectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
                         return new TableServiceClient(connectionString);
+                    });
+
+                    // Register QueueClient for product-queue
+                    services.AddSingleton(sp =>
+                    {
+                        var connectionString = Environment.GetEnvironmentVariable("AzureWebJobsStorage");
+                        var queueClient = new QueueClient(connectionString, "product-queue");
+                        queueClient.CreateIfNotExists();
+                        return queueClient;
                     });
 
                     // Register Repository and Service
